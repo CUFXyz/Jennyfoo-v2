@@ -18,7 +18,7 @@ func (dbi *DBInstance) GetUsers() (*[]models.User, error) {
 	}
 
 	for rows.Next() {
-		if err := rows.Scan(&user.Login, &user.Password, &user.Email); err != nil {
+		if err := rows.Scan(&user.Login, &user.Password, &user.Email, &user.Role); err != nil {
 			return &[]models.User{}, err
 		}
 		users = append(users, user)
@@ -27,18 +27,15 @@ func (dbi *DBInstance) GetUsers() (*[]models.User, error) {
 }
 
 // Getting only one user with specific parameters
-func (dbi *DBInstance) GetUser(params models.User) (*models.User, error) {
+func (dbi *DBInstance) GetUser(params *models.User) (*models.User, error) {
 	var user models.User
-	if params.Email == "" || params.Login == "" {
-		return nil, fmt.Errorf("empty params not allowed")
-	}
 
 	if params.Email != "" {
 		query := "SELECT * FROM Users WHERE email = $1"
 		row := dbi.sqlinstance.QueryRowx(query, params.Email)
 		err := row.Scan(&user.Login, &user.Password, &user.Email, &user.Role)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("email: %v", err)
 		}
 		return &user, nil
 	}
@@ -48,12 +45,22 @@ func (dbi *DBInstance) GetUser(params models.User) (*models.User, error) {
 		row := dbi.sqlinstance.QueryRowx(query, params.Login)
 		err := row.Scan(&user.Login, &user.Password, &user.Email, &user.Role)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("login: %v", err)
 		}
 		return &user, nil
 	}
 
-	return &user, fmt.Errorf("it's  not to be here")
+	if params.Password != "" {
+		query := "SELECT * FROM Users WHERE password = $1"
+		row := dbi.sqlinstance.QueryRowx(query, params.Password)
+		err := row.Scan(&user.Login, &user.Password, &user.Email, &user.Role)
+		if err != nil {
+			return nil, fmt.Errorf("password: %v", err)
+		}
+		return &user, nil
+	}
+
+	return &user, fmt.Errorf("it's not to be here")
 }
 
 // Sending data about users into db
