@@ -153,3 +153,46 @@ func (ep *EPHandler) LoginHandler(c *gin.Context) {
 		},
 	)
 }
+
+func (ep *EPHandler) PromoteUserHandler(c *gin.Context) {
+	var user, userdb *models.User
+	bytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			error.Error(fmt.Errorf("readall | | PromoteUserHandler: %v", err)),
+		)
+		return
+	}
+
+	err = json.Unmarshal(bytes, &user)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			error.Error(fmt.Errorf("unmarshal | | PromoteUserHandler: %v", err)),
+		)
+		return
+	}
+
+	userdb, err = ep.DB.GetUser(user)
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			error.Error(fmt.Errorf("getuser | | PromoteUserHandler: %v", err)),
+		)
+		return
+	}
+	err = ep.DB.PromoteUser(*userdb, "admin")
+	if err != nil {
+		c.JSON(
+			http.StatusBadRequest,
+			error.Error(fmt.Errorf("promoteuser | | PromoteUserHandler: %v", err)),
+		)
+		return
+	}
+
+	c.JSON(
+		http.StatusOK,
+		fmt.Sprintf("Successfuly promoted user: %v", userdb.Login),
+	)
+}

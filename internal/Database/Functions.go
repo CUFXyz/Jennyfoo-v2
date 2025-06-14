@@ -73,3 +73,28 @@ func (dbi *DBInstance) SendUser(user models.User) error {
 
 	return nil
 }
+
+func (dbi *DBInstance) PromoteUser(user models.User, role string) error {
+
+	done := false
+
+	if user.Login != "" {
+		query := "UPDATE Users SET role = $1 WHERE login = $2"
+		_, err := dbi.sqlinstance.Queryx(query, role, user.Login)
+		if err != nil {
+			return err
+		}
+		done = true
+	}
+
+	if user.Email != "" && !done {
+		query := "UPDATE Users SET role = $1 WHERE email = $2"
+		_, err := dbi.sqlinstance.Queryx(query, role, user.Email)
+		if err != nil {
+			return err
+		}
+		done = true
+	}
+
+	return nil
+}

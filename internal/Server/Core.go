@@ -35,8 +35,11 @@ func JFServerSetup(addr string) *JFServer {
 
 func (jfs *JFServer) Run() {
 	signedin := jfs.Engine.Group("/", jfs.EPHandler.Auth.AuthentificatorHandler)
+	admin := signedin.Group("/admin", jfs.EPHandler.Auth.AdministratorHandler)
 
-	signedin.GET("/", jfs.EPHandler.IndexHandler)
+	admin.GET("/userlist", jfs.EPHandler.IndexHandler)
+	admin.POST("/promote", jfs.EPHandler.PromoteUserHandler)
+
 	jfs.Engine.POST("/register", jfs.EPHandler.RegisterHandler)
 	jfs.Engine.POST("/login", jfs.EPHandler.LoginHandler)
 
