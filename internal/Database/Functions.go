@@ -12,7 +12,7 @@ func (dbi *DBInstance) GetUsers() (*[]models.User, error) {
 	var users []models.User
 	var user models.User
 	query := "SELECT * FROM Users"
-	rows, err := dbi.sqlinstance.Queryx(query)
+	rows, err := dbi.Sqlinstance.Queryx(query)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (dbi *DBInstance) GetUser(params *models.User) (*models.User, error) {
 
 	if params.Email != "" {
 		query := "SELECT * FROM Users WHERE email = $1"
-		row := dbi.sqlinstance.QueryRowx(query, params.Email)
+		row := dbi.Sqlinstance.QueryRowx(query, params.Email)
 		err := row.Scan(&user.Login, &user.Password, &user.Email, &user.Role)
 		if err != nil {
 			return nil, fmt.Errorf("email: %v", err)
@@ -42,7 +42,7 @@ func (dbi *DBInstance) GetUser(params *models.User) (*models.User, error) {
 
 	if params.Login != "" {
 		query := "SELECT * FROM Users WHERE login = $1"
-		row := dbi.sqlinstance.QueryRowx(query, params.Login)
+		row := dbi.Sqlinstance.QueryRowx(query, params.Login)
 		err := row.Scan(&user.Login, &user.Password, &user.Email, &user.Role)
 		if err != nil {
 			return nil, fmt.Errorf("login: %v", err)
@@ -52,7 +52,7 @@ func (dbi *DBInstance) GetUser(params *models.User) (*models.User, error) {
 
 	if params.Password != "" {
 		query := "SELECT * FROM Users WHERE password = $1"
-		row := dbi.sqlinstance.QueryRowx(query, params.Password)
+		row := dbi.Sqlinstance.QueryRowx(query, params.Password)
 		err := row.Scan(&user.Login, &user.Password, &user.Email, &user.Role)
 		if err != nil {
 			return nil, fmt.Errorf("password: %v", err)
@@ -66,7 +66,7 @@ func (dbi *DBInstance) GetUser(params *models.User) (*models.User, error) {
 // Sending data about users into db
 func (dbi *DBInstance) SendUser(user models.User) error {
 	query := "INSERT INTO Users (login, password, email, role) VALUES ($1, $2, $3, $4)"
-	_, err := dbi.sqlinstance.Queryx(query, user.Login, user.Password, user.Email, models.USERDEFAULT)
+	_, err := dbi.Sqlinstance.Queryx(query, user.Login, user.Password, user.Email, models.USERDEFAULT)
 	if err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func (dbi *DBInstance) PromoteUser(user models.User, role string) error {
 
 	if user.Login != "" {
 		query := "UPDATE Users SET role = $1 WHERE login = $2"
-		_, err := dbi.sqlinstance.Queryx(query, role, user.Login)
+		_, err := dbi.Sqlinstance.Queryx(query, role, user.Login)
 		if err != nil {
 			return err
 		}
@@ -89,7 +89,7 @@ func (dbi *DBInstance) PromoteUser(user models.User, role string) error {
 
 	if user.Email != "" && !done {
 		query := "UPDATE Users SET role = $1 WHERE email = $2"
-		_, err := dbi.sqlinstance.Queryx(query, role, user.Email)
+		_, err := dbi.Sqlinstance.Queryx(query, role, user.Email)
 		if err != nil {
 			return err
 		}

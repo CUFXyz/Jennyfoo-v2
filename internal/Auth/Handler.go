@@ -24,7 +24,7 @@ func (a *Authentificator) AuthentificatorHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(
 			http.StatusBadRequest,
-			error.Error(err),
+			"User is not logged in",
 		)
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
@@ -48,11 +48,6 @@ func (a *Authentificator) AuthentificatorHandler(c *gin.Context) {
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
-
-	c.JSON(
-		http.StatusOK,
-		"Successful session",
-	)
 
 	c.Next()
 }
@@ -86,11 +81,5 @@ func (a *Authentificator) AdministratorHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(
-		http.StatusOK,
-		"Welcome admin",
-	)
-
 	c.Next()
-
 }

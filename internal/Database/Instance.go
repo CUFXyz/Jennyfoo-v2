@@ -9,7 +9,7 @@ import (
 )
 
 type DBInstance struct {
-	sqlinstance *sqlx.DB
+	Sqlinstance *sqlx.DB
 }
 
 func Connect() *DBInstance {
@@ -19,6 +19,6 @@ func Connect() *DBInstance {
 	}
 	fmt.Println("Connected!")
 	return &DBInstance{
-		sqlinstance: db,
+		Sqlinstance: db,
 	}
 }
